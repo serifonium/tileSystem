@@ -8,7 +8,29 @@ import { player } from "./player.js";
 import { tx_dirt, tx_stone, tx_water } from "./texture.js";
 import { v } from "./vector.js";
 
+document.addEventListener("keydown", (e) => {
+    InputHandler.keyDown(e.key)
+})
+
+document.addEventListener("keyup", (e) => {
+    InputHandler.keyUp(e.key)
+})
+
+document.addEventListener("mousemove", (e) => {
+    InputHandler.updateMousePos(v(e.pageX, e.pageY))
+})
+
+document.addEventListener("mousedown", (e) => {
+    InputHandler.mouseDown()
+})
+
+document.addEventListener("mouseup", (e) => {
+    InputHandler.mouseUp()
+})
+
 changeCurrentMap(new Map(v(50)))
+
+multiplayerHandler.AskForUser()
 
 currentMap.SetTile(v(0, 0), v(50, 50), new Tile(tx_dirt, undefined, undefined));
 
@@ -24,7 +46,7 @@ function render() {
     // resize canvas to window size
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
-    Camera.updateSize()
+    Camera.updateSize(v(window.innerWidth, window.innerHeight))
 
     // move camera and mouse
     // InputHandler.gameMousePos.x += Camera.pos.x - (-player.getMiddle().x + window.innerWidth/(2*Camera.scaleFactor));

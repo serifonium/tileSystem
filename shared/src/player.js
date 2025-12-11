@@ -6,9 +6,9 @@ import { currentMap } from "./map.js";
 import { v } from "./vector.js";
 
 export class Player {
-    constructor(username) {
+    constructor(username, pos = v(200, 200)) {
         this.username = username
-        this.pos = v(200, 200)
+        this.pos = pos
         this.vel = v(0, 0)
         this.movementSpeed = 0.40
         this.scale = v(56)
@@ -30,6 +30,10 @@ export class Player {
     render() {
         ctx.fillStyle = '#133f9eff'
         ctx.fillRect(this.pos.x, this.pos.y, this.scale.x, this.scale.y)
+
+        ctx.font = "24px Arial"
+        ctx.textAlign = "center"
+        ctx.fillText(this.username, this.pos.x+this.scale.x/2, this.pos.y-16)
     }
 
     update() {

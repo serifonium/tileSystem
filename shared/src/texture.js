@@ -1,8 +1,10 @@
 export class Texture {
     constructor(imgsrc, collision = false) {
         this.imgsrc = imgsrc
-        this.image = new Image()
-        this.image.src = imgsrc
+        if(typeof Image !== "undefined") {
+            this.image = new Image()
+            this.image.src = imgsrc
+        }
         this.collision = collision
     }
 }

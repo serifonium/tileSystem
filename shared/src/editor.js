@@ -68,7 +68,7 @@ function render() {
     // resize canvas to window size
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
-    Camera.updateSize()
+    Camera.updateSize(v(window.innerWidth, window.innerHeight))
 
     // move camera and mouse
     // InputHandler.gameMousePos.x += Camera.pos.x - (-player.getMiddle().x + window.innerWidth/(2*Camera.scaleFactor));

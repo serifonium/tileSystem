@@ -52,24 +52,4 @@ class InputHandler {
     }
 }
 
-document.addEventListener("keydown", (e) => {
-    InputHandler.keyDown(e.key)
-})
-
-document.addEventListener("keyup", (e) => {
-    InputHandler.keyUp(e.key)
-})
-
-document.addEventListener("mousemove", (e) => {
-    InputHandler.updateMousePos(v(e.pageX, e.pageY))
-})
-
-document.addEventListener("mousedown", (e) => {
-    InputHandler.mouseDown()
-})
-
-document.addEventListener("mouseup", (e) => {
-    InputHandler.mouseUp()
-})
-
 export {InputHandler};

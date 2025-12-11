@@ -3,7 +3,7 @@ import {v} from "./vector.js"
 
 class Camera {
     static pos = v(0, 0);
-    static scale = v(window.innerWidth, window.innerHeight)
+    static scale = v(1000)
     static bounds = undefined
     static scaleFactor = 1;
     static vel = v(0)
@@ -15,8 +15,8 @@ class Camera {
         Camera.pos.y = Math.max(0, Camera.pos.y);
         if(Camera.bounds) Camera.pos.y = Math.min(Camera.bounds.y-Camera.scale.y, Camera.pos.y);
     }
-    static updateSize() {
-        Camera.scale = v(window.innerWidth, window.innerHeight)
+    static updateSize(scale) {
+        Camera.scale = scale
     }
     static updateVel() {
         Camera.pos.x += Camera.vel.x * getDeltaTime()
