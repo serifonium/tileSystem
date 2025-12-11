@@ -1,19 +1,21 @@
 import { Camera } from "./camera.js";
 import { canvas, ctx } from "./canvas.js";
 import { InputHandler } from "./inputHandling.js";
-import { Map, Tile } from "./map.js";
-import { tx_dirt, tx_stone } from "./texture.js";
+import { changeCurrentMap, currentMap, Map, parseMap, Tile } from "./map.js";
+import { tx_dirt, tx_stone, tx_water } from "./texture.js";
 import { v } from "./vector.js";
-
-var currentMap = new Map(v(50, 50));
 
 currentMap.SetTile(v(0, 0), v(50, 50), new Tile(tx_dirt, undefined, undefined));
 
 currentMap.SetTile(v(3, 5), v(3, 2), new Tile(undefined, tx_stone, undefined));
-currentMap.SetTile(v(4, 5), v(3, 2), new Tile(tx_dirt, undefined, undefined));
+currentMap.SetTile(v(4, 5), v(3, 2), new Tile(tx_water, undefined, undefined));
 currentMap.RemoveTile(v(4, 5), v(2, 1), new Tile(tx_dirt, undefined, undefined))
 
 console.log(currentMap);
+//console.log(currentMap.stringify());
+console.log(parseMap(currentMap.stringify()));
+
+changeCurrentMap(parseMap(currentMap.stringify()))
 
 function render() {
     // resize canvas to window size

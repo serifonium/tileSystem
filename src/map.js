@@ -1,4 +1,5 @@
 import { ctx } from "./canvas.js"
+import { Texture } from "./texture.js"
 import { v } from "./vector.js"
 
 class Map {
@@ -32,9 +33,11 @@ class Map {
             }
         }
     }
+    // Removes x-grounds if x-ground isnt set
     RemoveTile(pos, scale, tile) {
-        if(tile == undefined) tile = new Tile()
-        if(scale == undefined) scale = v(1, 1)
+        if(!tile) tile = new Tile()
+        if(!scale) scale = v(1, 1)
+
         for(let x = pos.x; x < pos.x+scale.x; x++) {
             if(this.tiles[x] == undefined) continue;
             for(let y = pos.y; y < pos.y+scale.y; y++) {
@@ -57,9 +60,9 @@ class Map {
 
     GetAllTiles() {
         var tileList = []
-        for(let x = 0; x < this.tiles.length; x++) {
+        for(let x = 0; x < this.tiles.length; x++) { // loop through x
             if(this.tiles[x] == undefined) continue;
-            for(let y = 0; y < this.tiles[x].length; y++) {
+            for(let y = 0; y < this.tiles[x].length; y++) { // loop through y
                 if(this.tiles[x][y] == undefined) continue;
                 tileList.push(this.tiles[x][y])
             }
@@ -71,6 +74,10 @@ class Map {
         for(let tile of this.GetAllTiles()) {
             tile.render()
         }
+    }
+
+    stringify() {
+        return JSON.stringify(this)
     }
 }
 
@@ -87,8 +94,41 @@ class Tile {
     }
 }
 
-function changeCurrentMap(map) {
+var currentMap = new Map();
 
+function changeCurrentMap(map) {
+    currentMap = map
 }
 
-export { Map, Tile, changeCurrentMap }
+function parseMap(mapString) {
+    var JSONmap = JSON.parse(mapString)
+    var map = new Map(JSONmap.size)
+
+    for (const [key, value] of Object.entries(JSONmap)) {
+        map[key] = value
+    }
+
+    map.tiles = [];
+
+    for(let x = 0; x < JSONmap.tiles.length; x++) { // loop through x
+        if(JSONmap.tiles[x] == undefined) continue;
+        for(let y = 0; y < JSONmap.tiles[x].length; y++) { // loop through y
+            if(JSONmap.tiles[x][y] == undefined) continue;
+
+            var tile = new Tile()
+
+            for (const [key, value] of Object.entries(JSONmap.tiles[x][y])) {
+                tile[key] = value
+            }
+
+            if(JSONmap.tiles[x][y].background) tile.background = new Texture(JSONmap.tiles[x][y].background.imgsrc);
+            if(JSONmap.tiles[x][y].midground) tile.midground = new Texture(JSONmap.tiles[x][y].midground.imgsrc);
+            if(JSONmap.tiles[x][y].foreground) tile.foreground = new Texture(JSONmap.tiles[x][y].foreground.imgsrc);
+
+            map.SetTile(v(x, y), v(1, 1), tile)
+        }
+    }
+    return map
+}
+
+export { Map, Tile, changeCurrentMap, parseMap, currentMap }
