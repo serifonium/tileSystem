@@ -1,3 +1,4 @@
+import { Camera } from "./camera.js";
 import { ctx } from "./canvas.js"
 import { generateID } from "./idGen.js"
 import { Texture } from "./texture.js"
@@ -41,7 +42,7 @@ class Map {
         }
     }
     /**
-     * Removes x-grounds if x-ground isnt set.
+     * Removes x-grounds if x-ground is set.
      * @param {Vector} pos The position to remove.
      * @param {Vector} scale The area to remove from the position.
      * @param {Tile} tile The tile settings to add.
@@ -56,15 +57,15 @@ class Map {
 
                 if(this.tiles[x][y] == undefined) continue;
 
-                if(!(tile.background || tile.midground || tile.foreground)) {
+                if(tile.background && tile.midground && tile.foreground) {
                     this.tiles[x][y] = undefined;
                     continue;
                 }
 
                 // removes x-ground if x-ground is not set
-                if(tile.background == undefined) this.tiles[x][y].background = undefined
-                if(tile.midground == undefined) this.tiles[x][y].midground = undefined
-                if(tile.foreground == undefined) this.tiles[x][y].foreground = undefined
+                if(tile.background != undefined) this.tiles[x][y].background = undefined
+                if(tile.midground != undefined) this.tiles[x][y].midground = undefined
+                if(tile.foreground != undefined) this.tiles[x][y].foreground = undefined
 
             }
         }
@@ -173,12 +174,31 @@ class Map {
         return undefined
     }
 
-    render() {
-        for(let tile of this.GetAllTiles()) {
-            if(tile.render) tile.render()
+    render(type) {
+        // if entities
+        if(type == "entities") {
+            for(let obj of this.GetAllEntities()) {
+                if(obj.render) obj.render()
+            }
+            return;
         }
-        for(let obj of this.GetAllEntities()) {
-            if(obj.render) obj.render()
+
+        var allTiles = this.GetAllTiles()
+
+        // else if no type
+        if(!type) {
+            for(let tile of allTiles) {
+                if(tile.render) tile.render()
+            }
+            for(let obj of this.GetAllEntities()) {
+                if(obj.render) obj.render()
+            }
+            return;
+        }
+
+        // else
+        for(let tile of allTiles) {
+            if(tile.render) tile.render(type)
         }
     }
 
@@ -202,10 +222,10 @@ class Tile {
         this.midground = midground // collision
         this.foreground = foreground // collision + utility
     }
-    render() {
-        if(this.background) ctx.drawImage(this.background.image, this.pos.x*this.tileSize, this.pos.y*this.tileSize, this.tileSize, this.tileSize)
-        if(this.midground) ctx.drawImage(this.midground.image, this.pos.x*this.tileSize, this.pos.y*this.tileSize, this.tileSize, this.tileSize)
-        if(this.foreground) ctx.drawImage(this.foreground.image, this.pos.x*this.tileSize, this.pos.y*this.tileSize, this.tileSize, this.tileSize)
+    render(type) {
+        if((type == "background" || type == undefined) && this.background) ctx.drawImage(this.background.image, this.pos.x*this.tileSize, this.pos.y*this.tileSize, this.tileSize, this.tileSize)
+        if((type == "midground" || type == undefined) && this.midground) ctx.drawImage(this.midground.image, this.pos.x*this.tileSize, this.pos.y*this.tileSize, this.tileSize, this.tileSize)
+        if((type == "foreground" || type == undefined) && this.foreground) ctx.drawImage(this.foreground.image, this.pos.x*this.tileSize, this.pos.y*this.tileSize, this.tileSize, this.tileSize)
     }
 }
 
@@ -213,6 +233,8 @@ var currentMap = new Map();
 
 function changeCurrentMap(map) {
     currentMap = map
+    if(currentMap.size) Camera.bounds = currentMap.size.multiply(currentMap.tileSize)
+    else Camera.bounds = undefined
 }
 
 function parseMap(mapString) {

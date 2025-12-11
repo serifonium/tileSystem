@@ -15,6 +15,7 @@ class Vector {
         return v(this.x + vector.x, this.y + vector.y)
     }
     multiply(vector) {
+        if(typeof vector === "number") return v(this.x * vector, this.y * vector)
         return v(this.x * vector.x, this.y * vector.y)
     }
     snap(factor) {

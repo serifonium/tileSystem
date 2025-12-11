@@ -6,11 +6,12 @@ import { currentMap } from "./map.js";
 import { v } from "./vector.js";
 
 export class Player {
-    constructor() {
-        this.pos = v(0, 0)
+    constructor(username) {
+        this.username = username
+        this.pos = v(200, 200)
         this.vel = v(0, 0)
         this.movementSpeed = 0.40
-        this.scale = v(64)
+        this.scale = v(56)
         this.keybinds = {
             "up":  ["w"],
             "down": ["s"],
@@ -24,10 +25,6 @@ export class Player {
             if(InputHandler.keys[key]) return true
         }
         return false
-    }
-
-    UpdateCameraPos() {
-        Camera.pos = v((this.pos.x-(window.innerWidth-this.scale.x)/2), (this.pos.y-(window.innerHeight-this.scale.y)/2))
     }
 
     render() {
@@ -66,8 +63,8 @@ export class Player {
             this.pos.y += directionVector.y
         }
 
-        this.UpdateCameraPos()
+        Camera.updatePos(v((this.pos.x-(window.innerWidth-this.scale.x)/2), (this.pos.y-(window.innerHeight-this.scale.y)/2)))
     }
 }
 
-export var player = new Player()
+export var player = new Player("serifonium")

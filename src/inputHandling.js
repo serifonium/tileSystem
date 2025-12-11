@@ -14,7 +14,7 @@ class InputHandler {
         this.gameMousePos = v((this.rawMousePos.x/Camera.scaleFactor-Camera.pos.x), (this.rawMousePos.y/Camera.scaleFactor-Camera.pos.y))
     }
     static getMousePos() {
-        return v((this.rawMousePos.x/Camera.scaleFactor-Camera.pos.x), (this.rawMousePos.y/Camera.scaleFactor-Camera.pos.y))
+        return v((this.rawMousePos.x/Camera.scaleFactor+Camera.pos.x), (this.rawMousePos.y/Camera.scaleFactor+Camera.pos.y))
     }
     static mouseDown(type) {
         if (type == 2) { this.mouse2Down = true; } 
