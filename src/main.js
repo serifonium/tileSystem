@@ -1,5 +1,6 @@
 import { Camera } from "./camera.js";
 import { canvas, ctx } from "./canvas.js";
+import { updateLastTime, updateTime } from "./deltaTime.js";
 import { InputHandler } from "./inputHandling.js";
 import { changeCurrentMap, currentMap, Map, parseMap, Tile } from "./map.js";
 import { player } from "./player.js";
@@ -32,7 +33,7 @@ function render() {
 
     // apply transformations
     ctx.scale(Camera.scaleFactor, Camera.scaleFactor);
-    ctx.translate(Camera.pos.x, Camera.pos.y);
+    ctx.translate(-Camera.pos.x, -Camera.pos.y);
     
     // render map
     currentMap.render();
@@ -44,7 +45,13 @@ function render() {
 }
 
 function update() {
+    updateTime()
 
+    currentMap.update();
+
+    player.update();
+
+    updateLastTime();
 }
 
 // setInterval setTimeout

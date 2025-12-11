@@ -5,10 +5,10 @@ import { v, Vector } from "./vector.js"
 
 class Map {
     constructor(size) {
-        this.tiles = []
-        this.entities = []
-        this.tileSize = 64
-        this.size = size
+        this.tiles = [];
+        this.entities = [];
+        this.tileSize = 64;
+        this.size = size;
     }
 
     /**
@@ -141,6 +141,36 @@ class Map {
             entityList.push(obj)
         }
         return entityList
+    }
+    /**
+     * Gets all tiles that an entity overlaps with.
+     * @param {Object} obj The entity to query.
+     * @return {Tile[]} List of overlapping tiles.
+     */
+    GetOverlappingTiles(obj) {
+        let tilePos = obj.pos.snap(this.tileSize)
+        let tilePos2 = obj.pos.add(obj.scale).snap(this.tileSize)
+
+        let tilelist = []
+        for(let x = tilePos.x; x < tilePos2.x+1; x++) {
+            for(let y = tilePos.y; y < tilePos2.y+1; y++) {
+                tilelist.push(this.GetTile(v(x, y)))
+            }   
+        }
+
+        return tilelist
+    }
+    /**
+     * Checks if an entity is overlapping with solid tiles.
+     * @param {Object} obj The entity to query.
+     * @return {Tile?} The overlapping tile, undefined if no collisions.
+     */
+    CheckObjOverlap(obj) {
+        var tilelist = this.GetOverlappingTiles(obj)
+        for(let tile of tilelist) {
+            if(tile == undefined || tile.midground || tile.background.collision == true) return tile
+        }
+        return undefined
     }
 
     render() {
