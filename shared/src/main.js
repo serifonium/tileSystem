@@ -65,21 +65,23 @@ function render() {
     currentMap.render("background");
     currentMap.render("midground");
     player.render();
+    multiplayerHandler.renderPlayers();
     currentMap.render("entities");
     currentMap.render("foreground");
-
-    // render player
-    
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
+var updateTick = 0
 function update() {
+    updateTick++;
     updateTime()
 
     currentMap.update();
 
     player.update();
+
+    if(updateTick%4) multiplayerHandler.UpdatePosition()
 
     updateLastTime();
 }

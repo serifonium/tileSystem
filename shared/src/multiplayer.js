@@ -1,4 +1,5 @@
 import { Player, player } from "./player.js";
+import { v } from "./vector.js";
 
 class MultiplayerHandler {
     constructor(serverURL) {
@@ -34,6 +35,15 @@ class MultiplayerHandler {
             }
         })
 
+        this.socket.on("updatePos", (cache) => {
+            let player_ = this.GetPlayerById(cache.id)
+            if(!player_) return;
+            // console.log(player_, cache)
+
+            // update pos and vel
+            player_.pos = v(cache.pos.x, cache.pos.y)
+        })
+
         this.socket.on('removePlayer', (id)=>{
             console.log("SERVER: remove player", id)
             for(let p in this.players) {
@@ -60,7 +70,19 @@ class MultiplayerHandler {
             this.AskForUser()
         }
     }
-    
+    GetPlayerById(id) {
+        for(let player_ of this.players) {
+            if(player_.id == id) return player_;
+        }
+    }
+    UpdatePosition() {
+        this.socket.emit("updatePos", {"pos": player.pos})
+    }
+    renderPlayers() {
+        for(let player_ of this.players) {
+            player_.render()
+        }
+    }
 }
 
 var multiplayerHandler = new MultiplayerHandler("http://localhost:8080")

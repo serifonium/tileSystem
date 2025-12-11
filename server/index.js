@@ -27,6 +27,12 @@ io.on("connection", socket => {
         //sends map, players, id, team to new client
         socket.emit('setupPlayer', {"userId": socket.id, "clients": clientInfo}) 
 
+        socket.on("updatePos", (cache) => {
+            //console.log(cache)
+            clientInfo[socket.id].pos = cache.pos
+            io.sockets.emit("updatePos", {"id": socket.id, "pos": cache.pos})
+        })
+
         // adds new player to all clients
         io.sockets.emit('addNewPlayer', clientInfo[socket.id])
     })
