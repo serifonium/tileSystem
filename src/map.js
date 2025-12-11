@@ -1,16 +1,23 @@
 import { ctx } from "./canvas.js"
+import { generateID } from "./idGen.js"
 import { Texture } from "./texture.js"
-import { v } from "./vector.js"
+import { v, Vector } from "./vector.js"
 
 class Map {
     constructor(size) {
         this.tiles = []
+        this.entities = []
         this.tileSize = 64
         this.size = size
     }
 
-    // Sets an area to a specified tile
-    // If tiles overlap the newext x-grounds are carried over
+    /**
+     * Sets an area to a specified tile.
+     * If tiles overlap the newest x-grounds are carried over
+     * @param {Vector} pos The position to set.
+     * @param {Vector} scale The area to set from the position.
+     * @param {Tile} tile_ The tile settings to add.
+     */
     SetTile(pos, scale, tile_) {
         if(scale == undefined) scale = v(1, 1)
         for(let x = pos.x; x < pos.x+scale.x; x++) {
@@ -33,7 +40,12 @@ class Map {
             }
         }
     }
-    // Removes x-grounds if x-ground isnt set
+    /**
+     * Removes x-grounds if x-ground isnt set.
+     * @param {Vector} pos The position to remove.
+     * @param {Vector} scale The area to remove from the position.
+     * @param {Tile} tile The tile settings to add.
+     */
     RemoveTile(pos, scale, tile) {
         if(!tile) tile = new Tile()
         if(!scale) scale = v(1, 1)
@@ -57,7 +69,57 @@ class Map {
             }
         }
     }
+    /**
+     * Get the tile at a position.
+     * @param {Vector} pos The position to check.
+     * @return {Tile} The tile at the position.
+     */
+    GetTile(pos) {
+        if(this.tiles[pos.x] == undefined) return undefined;
+        if(this.tiles[pos.x][pos.y] == undefined) return undefined;
 
+        return this.tiles[pos.x][pos.y]
+    }
+    /**
+     * Adds an entity and returns its unique ID.
+     * @param {Object} obj The entity to add.
+     * @return {String} The unique ID of the entity.
+     */
+    AddEntity(obj) {
+        obj.id = generateID()
+        this.entities.push(obj)
+        return obj.id
+    }
+    /**
+     * Removes an entity by its ID.
+     * @param {String} id The ID to remove.
+     * @return {Boolean} If the entity was removed.
+     */
+    RemoveEntity(id) {
+        for(let o in this.entities) {
+            if(this.entities[o].id == id) {
+                this.entities.splice(o, 1)
+                return true;
+            }
+        }
+        return false
+    }
+    /**
+     * Fetches an entity by its ID.
+     * @param {String} id The ID to query.
+     * @return {Object} The entity with the ID.
+     */
+    GetEntityByID(id) {
+        for(let obj of this.entities) {
+            if(obj.id == id) {
+                return obj;
+            }
+        }
+    }
+    /**
+     * Fetches all tiles.
+     * @return {Tile[]} The list of all tiles.
+     */
     GetAllTiles() {
         var tileList = []
         for(let x = 0; x < this.tiles.length; x++) { // loop through x
@@ -69,10 +131,33 @@ class Map {
         }
         return tileList
     }
+    /**
+     * Fetches all entites.
+     * @return {Object[]} The list of all entites.
+     */
+    GetAllEntities() {
+        var entityList = []
+        for(let obj of this.entities) {
+            entityList.push(obj)
+        }
+        return entityList
+    }
 
     render() {
         for(let tile of this.GetAllTiles()) {
-            tile.render()
+            if(tile.render) tile.render()
+        }
+        for(let obj of this.GetAllEntities()) {
+            if(obj.render) obj.render()
+        }
+    }
+
+    update() {
+        for(let tile of this.GetAllTiles()) {
+            if(tile.update) tile.update()
+        }
+        for(let obj of this.GetAllEntities()) {
+            if(obj.update) obj.update()
         }
     }
 

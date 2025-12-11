@@ -54,7 +54,6 @@ class InputHandler {
 
 document.addEventListener("keydown", (e) => {
     InputHandler.keyDown(e.key)
-    console.log(InputHandler.keys)
 })
 
 document.addEventListener("keyup", (e) => {

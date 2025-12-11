@@ -2,20 +2,19 @@ import { Camera } from "./camera.js";
 import { canvas, ctx } from "./canvas.js";
 import { InputHandler } from "./inputHandling.js";
 import { changeCurrentMap, currentMap, Map, parseMap, Tile } from "./map.js";
+import { player } from "./player.js";
 import { tx_dirt, tx_stone, tx_water } from "./texture.js";
 import { v } from "./vector.js";
 
 currentMap.SetTile(v(0, 0), v(50, 50), new Tile(tx_dirt, undefined, undefined));
 
 currentMap.SetTile(v(3, 5), v(3, 2), new Tile(undefined, tx_stone, undefined));
-currentMap.SetTile(v(4, 5), v(3, 2), new Tile(tx_water, undefined, undefined));
+currentMap.SetTile(v(4, 5), v(3, 3), new Tile(tx_water, undefined, undefined));
 currentMap.RemoveTile(v(4, 5), v(2, 1), new Tile(tx_dirt, undefined, undefined))
 
-console.log(currentMap);
-//console.log(currentMap.stringify());
-console.log(parseMap(currentMap.stringify()));
+let tempID = currentMap.AddEntity({"pos":v(0, 0)})
 
-changeCurrentMap(parseMap(currentMap.stringify()))
+console.log(currentMap);
 
 function render() {
     // resize canvas to window size
@@ -34,15 +33,20 @@ function render() {
     // apply transformations
     ctx.scale(Camera.scaleFactor, Camera.scaleFactor);
     ctx.translate(Camera.pos.x, Camera.pos.y);
-
-    // render player
-    // player.render();
     
     // render map
     currentMap.render();
 
+    // render player
+    player.render();
+
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
-// setInterval(render, 1000/60);
-setTimeout(render, 1000/60);
+function update() {
+
+}
+
+// setInterval setTimeout
+setInterval(render, 1000/60);
+setInterval(update, 1000/60);
