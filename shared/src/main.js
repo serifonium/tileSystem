@@ -1,6 +1,7 @@
 import { Camera } from "./camera.js";
 import { canvas, ctx } from "./canvas.js";
 import { updateLastTime, updateTime } from "./deltaTime.js";
+import { HealthPack } from "./healthpack.js";
 import { InputHandler } from "./inputHandling.js";
 import { changeCurrentMap, currentMap, Map, parseMap, Tile } from "./map.js";
 import { multiplayerHandler } from "./multiplayer.js";
@@ -29,19 +30,14 @@ document.addEventListener("mouseup", (e) => {
 })
 
 changeCurrentMap(new Map(v(50)))
-
-multiplayerHandler.AskForUser()
-
 currentMap.SetTile(v(0, 0), v(50, 50), new Tile(tx_dirt, undefined, undefined));
-
 currentMap.SetTile(v(3, 5), v(3, 2), new Tile(undefined, tx_stone, undefined));
 currentMap.SetTile(v(4, 5), v(3, 3), new Tile(tx_water, undefined, undefined));
 currentMap.RemoveTile(v(4, 5), v(2, 1), new Tile(undefined, 0, undefined))
 
-let tempID = currentMap.AddEntity({"pos":v(0, 0)})
+multiplayerHandler.AskForUser()
 
-console.log(currentMap);
-
+// RENDER
 function render() {
     // resize canvas to window size
     canvas.width = window.innerWidth
@@ -64,14 +60,15 @@ function render() {
     // render map & player
     currentMap.render("background");
     currentMap.render("midground");
-    player.render();
-    multiplayerHandler.renderPlayers();
     currentMap.render("entities");
+    multiplayerHandler.renderPlayers();
+    player.render();
     currentMap.render("foreground");
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
+// UPDATE
 var updateTick = 0
 function update() {
     updateTick++;
@@ -90,3 +87,18 @@ function update() {
 // setInterval setTimeout
 setInterval(render, 1000/60);
 setInterval(update, 1000/60);
+
+console.log("---HealthComponent Test:---")
+console.log("Current Health: " + player.health.GetHealth())
+player.health.Damage(149)
+console.log("Current Health: " + player.health.GetHealth())
+player.health.Heal(25)
+console.log("Current Health: " + player.health.GetHealth())
+console.log("---HealthComponent Test End---")
+
+// setTimeout(()=>{
+//     let tempID = currentMap.AddEntity(new HealthPack(v(64*Math.floor(Math.random()*7)+3, 64*2)));
+//     console.log(currentMap.GetEntityByID(tempID))
+
+//     multiplayerHandler.AddEntity(currentMap.GetEntityByID(tempID))
+// }, 300)

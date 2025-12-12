@@ -1,5 +1,6 @@
 import { Camera } from "./camera.js";
 import { ctx } from "./canvas.js"
+import { HealthPack } from "./healthpack.js";
 import { generateID } from "./idGen.js"
 import { Texture } from "./texture.js"
 import { v, Vector } from "./vector.js"
@@ -86,9 +87,18 @@ class Map {
      * @param {Object} obj The entity to add.
      * @return {String} The unique ID of the entity.
      */
-    AddEntity(obj) {
-        obj.id = generateID()
+    AddEntity(obj, id) {
+
+        // set id
+        if(id) obj.id = id
+        else obj.id = generateID()
+
+        // set className
+        obj.className = obj.constructor.name
+
+        // add entity
         this.entities.push(obj)
+
         return obj.id
     }
     /**
@@ -166,7 +176,7 @@ class Map {
      * @param {Object} obj The entity to query.
      * @return {Tile?} The overlapping tile, undefined if no collisions.
      */
-    CheckObjOverlap(obj) {
+    CheckObjCollision(obj) {
         var tilelist = this.GetOverlappingTiles(obj)
         for(let tile of tilelist) {
             if(tile == undefined || tile.midground || tile.background.collision == true) return tile
@@ -214,6 +224,18 @@ class Map {
     stringify() {
         return JSON.stringify(this)
     }
+
+    static _ObjToEntity_(obj_) {
+        var obj;
+        
+        if(obj_.className == "HealthPack") obj = new HealthPack()
+        
+        for (const [key, value] of Object.entries(obj_)) {
+            obj[key] = value
+        }
+
+        return obj
+    }
 }
 
 class Tile {
@@ -229,14 +251,6 @@ class Tile {
     }
 }
 
-var currentMap = new Map();
-
-function changeCurrentMap(map) {
-    currentMap = map
-    if(currentMap.size) Camera.bounds = currentMap.size.multiply(currentMap.tileSize)
-    else Camera.bounds = undefined
-}
-
 function parseMap(mapString) {
     var JSONmap = JSON.parse(mapString)
     var map = new Map(JSONmap.size)
@@ -246,7 +260,9 @@ function parseMap(mapString) {
     }
 
     map.tiles = [];
+    map.entities = [];
 
+    // parse tiles
     for(let x = 0; x < JSONmap.tiles.length; x++) { // loop through x
         if(JSONmap.tiles[x] == undefined) continue;
         for(let y = 0; y < JSONmap.tiles[x].length; y++) { // loop through y
@@ -265,7 +281,24 @@ function parseMap(mapString) {
             map.SetTile(v(x, y), v(1, 1), tile)
         }
     }
+
+    // parse entities
+    for(let j = 0; j < JSONmap.entities.length; j++) {
+        var JSONobj = JSONmap.entities[j]
+        var obj = Map._ObjToEntity_(JSONobj)
+
+        map.AddEntity(obj, obj.id)
+    }
+
     return map
+}
+
+var currentMap = new Map();
+
+function changeCurrentMap(map) {
+    currentMap = map
+    if(currentMap.size) Camera.bounds = currentMap.size.multiply(currentMap.tileSize)
+    else Camera.bounds = undefined
 }
 
 export { Map, Tile, changeCurrentMap, parseMap, currentMap }

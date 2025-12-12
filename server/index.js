@@ -3,6 +3,9 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { v } from '../shared/src/vector.js';
 import { Player } from '../shared/src/player.js';
+import { Map, Tile } from '../shared/src/map.js';
+import { tx_dirt } from '../shared/src/texture.js';
+import { HealthPack } from '../shared/src/healthpack.js';
 
 const PORT = 8080;
 
@@ -15,6 +18,13 @@ const io = new Server(httpServer, {
     }
 });
 
+// setup map
+var currentMap = new Map()
+currentMap.SetTile(v(0, 0), v(50, 50), new Tile(tx_dirt, undefined, undefined))
+
+let tempID = currentMap.AddEntity(new HealthPack(v(64*Math.floor(Math.random()*7)+3, 64*2)));
+console.log(currentMap.GetEntityByID(tempID))
+
 var clientInfo = {}
 
 io.on("connection", socket => {
@@ -25,12 +35,19 @@ io.on("connection", socket => {
         clientInfo[socket.id].id = socket.id
 
         //sends map, players, id, team to new client
-        socket.emit('setupPlayer', {"userId": socket.id, "clients": clientInfo}) 
+        socket.emit('setupPlayer', {"userId": socket.id, "clients": clientInfo, "currentMap": currentMap.stringify()}) 
 
+        // update position when requested
         socket.on("updatePos", (cache) => {
-            //console.log(cache)
             clientInfo[socket.id].pos = cache.pos
             io.sockets.emit("updatePos", {"id": socket.id, "pos": cache.pos})
+        })
+
+        // add entity when requested
+        socket.on("addEntity", (obj)=>{
+            console.log(Map._ObjToEntity_(obj))
+            currentMap.AddEntity(Map._ObjToEntity_(obj), obj.id)
+            io.sockets.emit("addEntity", obj)
         })
 
         // adds new player to all clients
@@ -43,10 +60,12 @@ io.on("connection", socket => {
     })
 })
 
+// open server
 httpServer.listen(PORT, () => {
     console.log(`Server listening on *:${PORT}`);
 });
 
+// status logging
 setInterval(()=>{
     console.log("*-----*")
     for (const [key, value] of Object.entries(clientInfo)) {
