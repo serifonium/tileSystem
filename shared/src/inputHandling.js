@@ -40,7 +40,6 @@ class InputHandler {
         this.keys[key.toLowerCase()] = false;
     }
     static getKey(key) {
-        //console.log(this.keys, key)
         return this.keys[key];
     }
     static getRawKey(key) {

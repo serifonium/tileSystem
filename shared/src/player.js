@@ -1,3 +1,4 @@
+import { serverCommunicator } from "../../server/serverCommunicator.js";
 import { Camera } from "./camera.js";
 import { ctx } from "./canvas.js";
 import { getDeltaTime } from "./deltaTime.js";
@@ -23,9 +24,13 @@ export class Player {
         }
     }
 
+    getMiddle() {
+        return v(this.pos.x+this.scale.x/2, this.pos.y+this.scale.y/2)
+    }
+
     IsKeybindDown(keybind) {
         for(let key of this.keybinds[keybind]) {
-            if(InputHandler.keys[key]) return true
+            if(this.keys[key]) return true
         }
         return false
     }
@@ -54,6 +59,8 @@ export class Player {
         directionVector = directionVector.multiply(v(getDeltaTime()))
         directionVector = directionVector.multiply(v(this.movementSpeed))
 
+        if(directionVector.x == 0 && directionVector.y == 0) return;
+
         var overlappingX = currentMap.CheckObjCollision({pos:v(this.pos.x + directionVector.x, this.pos.y), scale:v(this.scale.x, this.scale.y)})
         if(overlappingX) {
             if(directionVector.x < 0) this.pos.x = ( overlappingX.pos.x + 1 ) * currentMap.tileSize + 0.01
@@ -70,7 +77,9 @@ export class Player {
             this.pos.y += directionVector.y
         }
 
-        Camera.updatePos(v((this.pos.x-(window.innerWidth-this.scale.x)/2), (this.pos.y-(window.innerHeight-this.scale.y)/2)))
+        serverCommunicator.Emit("updatePos", {"id": this.id, "pos": this.pos})
+
+        // Camera.updatePos(v((this.pos.x-(window.innerWidth-this.scale.x)/2), (this.pos.y-(window.innerHeight-this.scale.y)/2)))
     }
 }
 

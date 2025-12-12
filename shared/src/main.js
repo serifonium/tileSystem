@@ -11,10 +11,12 @@ import { v } from "./vector.js";
 
 document.addEventListener("keydown", (e) => {
     InputHandler.keyDown(e.key)
+    multiplayerHandler.SendCurrentKeys(InputHandler.keys)
 })
 
 document.addEventListener("keyup", (e) => {
     InputHandler.keyUp(e.key)
+    multiplayerHandler.SendCurrentKeys(InputHandler.keys)
 })
 
 document.addEventListener("mousemove", (e) => {
@@ -47,7 +49,7 @@ function render() {
     // move camera and mouse
     // InputHandler.gameMousePos.x += Camera.pos.x - (-player.getMiddle().x + window.innerWidth/(2*Camera.scaleFactor));
     // InputHandler.gameMousePos.y += Camera.pos.y - (-player.getMiddle().y + window.innerHeight/(2*Camera.scaleFactor));
-    // Camera.updatePos(v(-player.getMiddle().x + window.innerWidth/(2*Camera.scaleFactor), -player.getMiddle().y + window.innerHeight/(2*Camera.scaleFactor)))
+    Camera.updatePos(v(-(-player.getMiddle().x + window.innerWidth/(2*Camera.scaleFactor)), -(-player.getMiddle().y + window.innerHeight/(2*Camera.scaleFactor))))
 
     // fill background
     ctx.fillStyle = "#222"
@@ -74,11 +76,11 @@ function update() {
     updateTick++;
     updateTime()
 
-    currentMap.update();
+    //currentMap.update();
 
-    player.update();
+    //player.update();
 
-    if(updateTick%4) multiplayerHandler.UpdatePosition()
+    //if(updateTick%4) multiplayerHandler.UpdatePosition()
 
     updateLastTime();
 }
@@ -88,13 +90,7 @@ function update() {
 setInterval(render, 1000/60);
 setInterval(update, 1000/60);
 
-console.log("---HealthComponent Test:---")
-console.log("Current Health: " + player.health.GetHealth())
-player.health.Damage(149)
-console.log("Current Health: " + player.health.GetHealth())
-player.health.Heal(25)
-console.log("Current Health: " + player.health.GetHealth())
-console.log("---HealthComponent Test End---")
+
 
 // setTimeout(()=>{
 //     let tempID = currentMap.AddEntity(new HealthPack(v(64*Math.floor(Math.random()*7)+3, 64*2)));

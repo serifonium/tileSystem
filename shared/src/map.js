@@ -1,6 +1,8 @@
+import { serverCommunicator } from "../../server/serverCommunicator.js";
 import { Camera } from "./camera.js";
 import { ctx } from "./canvas.js"
-import { HealthPack } from "./healthpack.js";
+import { Cart } from "./cart.js";
+import { HealthPack, HealthPackSpawner } from "./healthpack.js";
 import { generateID } from "./idGen.js"
 import { Texture } from "./texture.js"
 import { v, Vector } from "./vector.js"
@@ -98,6 +100,7 @@ class Map {
 
         // add entity
         this.entities.push(obj)
+        serverCommunicator.Emit("addEntity", obj)
 
         return obj.id
     }
@@ -107,6 +110,7 @@ class Map {
      * @return {Boolean} If the entity was removed.
      */
     RemoveEntity(id) {
+        serverCommunicator.Emit("removeEntity", id)
         for(let o in this.entities) {
             if(this.entities[o].id == id) {
                 this.entities.splice(o, 1)
@@ -217,7 +221,7 @@ class Map {
             if(tile.update) tile.update()
         }
         for(let obj of this.GetAllEntities()) {
-            if(obj.update) obj.update()
+            if(obj.update) obj.update(this)
         }
     }
 
@@ -228,7 +232,9 @@ class Map {
     static _ObjToEntity_(obj_) {
         var obj;
         
+        if(obj_.className == "Cart") obj = new Cart()
         if(obj_.className == "HealthPack") obj = new HealthPack()
+        if(obj_.className == "HealthPackSpawner") obj = new HealthPackSpawner()
         
         for (const [key, value] of Object.entries(obj_)) {
             obj[key] = value

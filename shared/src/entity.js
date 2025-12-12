@@ -12,4 +12,7 @@ export class Entity {
         }
         return true;
     }
+    getMiddle() {
+        return v(this.pos.x+this.scale.x/2, this.pos.y+this.scale.y/2)
+    }
 }

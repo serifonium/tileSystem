@@ -1,3 +1,4 @@
+import { InputHandler } from "./inputHandling.js";
 import { changeCurrentMap, currentMap, Map, parseMap } from "./map.js";
 import { Player, player } from "./player.js";
 import { v } from "./vector.js";
@@ -55,6 +56,11 @@ class MultiplayerHandler {
             }
         })
 
+        this.socket.on('removeEntity', (id)=>{
+            currentMap.RemoveEntity(id)
+        })
+        
+
         this.socket.on('removePlayer', (id)=>{
             console.log("SERVER: remove player", id)
             for(let p in this.players) {
@@ -85,6 +91,7 @@ class MultiplayerHandler {
         for(let player_ of this.players) {
             if(player_.id == id) return player_;
         }
+        if(player.id == id) return player;
     }
     UpdatePosition() {
         this.socket.emit("updatePos", {"pos": player.pos})
@@ -102,6 +109,9 @@ class MultiplayerHandler {
     }
     GetConnectedPlayers() {
         return this.players;
+    }
+    SendCurrentKeys() {
+        this.socket.emit("currentkeys", InputHandler.keys)
     }
 }
 

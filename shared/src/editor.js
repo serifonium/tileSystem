@@ -2,9 +2,33 @@ import { Camera } from "./camera.js"
 import { canvas, ctx } from "./canvas.js"
 import { getDeltaTime, updateLastTime, updateTime } from "./deltaTime.js"
 import { InputHandler } from "./inputHandling.js"
-import { changeCurrentMap, Map, currentMap, Tile } from "./map.js"
+import { changeCurrentMap, Map, currentMap, Tile, parseMap } from "./map.js"
 import { tx_dirt, tx_stone, tx_water } from "./texture.js"
 import { v } from "./vector.js"
+import map2json from "../maps/wayside.json" with { type: 'json' }
+
+console.log(map2json)
+
+document.addEventListener("keydown", (e) => {
+    InputHandler.keyDown(e.key)
+    //multiplayerHandler.SendCurrentKeys(InputHandler.keys)
+})
+
+document.addEventListener("keyup", (e) => {
+    InputHandler.keyUp(e.key)
+})
+
+document.addEventListener("mousemove", (e) => {
+    InputHandler.updateMousePos(v(e.pageX, e.pageY))
+})
+
+document.addEventListener("mousedown", (e) => {
+    InputHandler.mouseDown()
+})
+
+document.addEventListener("mouseup", (e) => {
+    InputHandler.mouseUp()
+})
 
 function getUserSizePrompt() {
     var userPrompt = prompt("Map Size? (leave empty for none) (eg. '50,50')")
@@ -18,9 +42,11 @@ function getUserSizePrompt() {
 }
 
 // setup map
-var mapSize = undefined
-changeCurrentMap(new Map(mapSize))
-currentMap.SetTile(v(0), v(100), new Tile(tx_dirt, undefined, undefined))
+// var mapSize = undefined
+// changeCurrentMap(new Map(mapSize))
+// currentMap.SetTile(v(0), v(100), new Tile(tx_dirt, undefined, undefined))
+
+changeCurrentMap(parseMap(JSON.stringify(map2json)))
 
 // setup settings
 Camera.scaleFactor = 1/2
@@ -61,6 +87,8 @@ document.addEventListener("keydown", (e) => {
         if(index >= allLayers.length - 1) index = 0
         else index++
         selectedLayer = allLayers[index]
+    } else if(key == 'm') {
+        console.log(currentMap.stringify())
     }
 }) 
 
